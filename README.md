@@ -1,4 +1,4 @@
-# CordinatesAnnotation
+# CoordinatesAnnotation
 ![demo](https://user-images.githubusercontent.com/36182771/66269732-317cc400-e887-11e9-8d14-5d5be0bee1ad.jpg)
 
 Open File        : Open an image file  
