@@ -3,9 +3,10 @@
 #
 
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QFileDialog
-from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QLabel,
+                             QFileDialog)
+from PyQt5.QtGui import QImage, QPixmap, QIcon
+from PyQt5.QtCore import QSize
 
 from util import resize, reproduce
 
@@ -21,9 +22,9 @@ class ExampleWidget(QWidget):
         super().__init__()
         self.left = 300
         self.top = 300
-        self.width = 1200
+        self.width = 1000
         self.height = 800
-        self.img_x = 200
+        self.img_x = 160
         self.img_y = 0
         self.SIZE = 800
         self.setGeometry(self.left, self.top, self.width, self.height)
@@ -43,46 +44,87 @@ class ExampleWidget(QWidget):
         self.save_dir = None
 
         self.le = QLabel(self)
-        self.le.setPixmap(QPixmap.fromImage(QImage(self.SIZE, self.SIZE, QImage.Format_ARGB32)))
+        image = cv2.imread("white.jpg")
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        h, w = image.shape[:2]
+        qimg = QImage(image.flatten(), w, h, QImage.Format_RGB888)
+        self.le.setPixmap(QPixmap.fromImage(qimg))
         self.le.move(self.img_x, self.img_y)
         self.show()
 
     def setButton(self):
-        self.btn1 = QPushButton("Open File", self)
-        self.btn1.clicked.connect(self.open_file)
+        self.btn1 = QPushButton(self)
+        self.btn1.setIcon(QIcon('icons/open.png'))
+        self.btn1.setIconSize(QSize(80, 40))
         self.btn1.move(0, 0)
+        self.btn1.clicked.connect(self.open_file)
+        self.lbl1 = QLabel("Open File", self)
+        self.lbl1.move(20, 55)
 
-        self.btn2 = QPushButton("Open Dir", self)
-        self.btn2.move(0, 50)
+        self.btn2 = QPushButton(self)
+        # self.btn2 = QPushButton("Open Dir", self)
+        self.btn2.setIcon(QIcon('icons/open.png'))
+        self.btn2.setIconSize(QSize(80, 40))
+        self.btn2.move(0, 80)
         self.btn2.clicked.connect(self.open_dir)
+        self.lbl2 = QLabel("Open Dir", self)
+        self.lbl2.move(20, 135)
 
-        self.btn3 = QPushButton("Select Save Dir", self)
-        self.btn3.move(0, 100)
+        self.btn3 = QPushButton(self)
+        self.btn3.setIcon(QIcon('icons/open.png'))
+        self.btn3.setIconSize(QSize(80, 40))
+        self.btn3.move(0, 160)
         self.btn3.clicked.connect(self.set_save_dir)
+        self.lbl3 = QLabel("Select Save Dir", self)
+        self.lbl3.move(20, 215)
 
-        self.btn4 = QPushButton("Next", self)
-        self.btn4.move(0, 150)
+        self.btn4 = QPushButton(self)
+        self.btn4.setIcon(QIcon('icons/next.png'))
+        self.btn4.setIconSize(QSize(80, 40))
+        self.btn4.move(0, 240)
         self.btn4.clicked.connect(self.next_img)
+        self.lbl4 = QLabel("Next", self)
+        self.lbl4.move(20, 295)
 
-        self.btn5 = QPushButton("Previous", self)
-        self.btn5.move(0, 200)
+        self.btn5 = QPushButton(self)
+        self.btn5.setIcon(QIcon('icons/prev.png'))
+        self.btn5.setIconSize(QSize(80, 40))
+        self.btn5.move(0, 320)
         self.btn5.clicked.connect(self.pre_img)
+        self.lbl5 = QLabel("Previous", self)
+        self.lbl5.move(20, 375)
 
-        self.btn6 = QPushButton("Save", self)
-        self.btn6.move(0, 250)
+        self.btn6 = QPushButton(self)
+        self.btn6.setIcon(QIcon('icons/save.png'))
+        self.btn6.setIconSize(QSize(80, 40))
+        self.btn6.move(0, 400)
         self.btn6.clicked.connect(self.save)
+        self.lbl6 = QLabel("Save", self)
+        self.lbl6.move(20, 455)
 
-        self.btn7 = QPushButton("Delete A Point", self)
-        self.btn7.move(0, 300)
+        self.btn7 = QPushButton(self)
+        self.btn7.setIcon(QIcon('icons/undo.png'))
+        self.btn7.setIconSize(QSize(80, 40))
+        self.btn7.move(0, 480)
         self.btn7.clicked.connect(self.delete)
+        self.lbl7 = QLabel("Delete A Point", self)
+        self.lbl7.move(20, 535)
 
-        self.btn7 = QPushButton("Delete All Point", self)
-        self.btn7.move(0, 350)
-        self.btn7.clicked.connect(self.deleteAll)
+        self.btn8 = QPushButton(self)
+        self.btn8.setIcon(QIcon('icons/undo.png'))
+        self.btn8.setIconSize(QSize(80, 40))
+        self.btn8.move(0, 560)
+        self.btn8.clicked.connect(self.deleteAll)
+        self.lbl8 = QLabel("Delete All Points", self)
+        self.lbl8.move(20, 615)
 
-        self.btn8 = QPushButton("export", self)
-        self.btn8.move(0, 400)
-        self.btn8.clicked.connect(self.export)
+        self.btn9 = QPushButton(self)
+        self.btn9.setIcon(QIcon('icons/done.png'))
+        self.btn9.setIconSize(QSize(80, 40))
+        self.btn9.move(0, 640)
+        self.btn9.clicked.connect(self.export)
+        self.lbl9 = QLabel("Export", self)
+        self.lbl9.move(20, 695)
 
     def open_file(self):
         file = QFileDialog.getOpenFileName(self, 'Open file', "Image files (*.jpg *.gif)")
