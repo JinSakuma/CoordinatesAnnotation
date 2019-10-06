@@ -1,5 +1,6 @@
 # CoordinatesAnnotation
-![demo](https://user-images.githubusercontent.com/36182771/66269732-317cc400-e887-11e9-8d14-5d5be0bee1ad.jpg)
+![demo](https://user-images.githubusercontent.com/36182771/66269898-11e69b00-e889-11e9-81f5-2d5c5e1b0de1.jpg)
+
 
 Open File        : Open an image file  
 Open Dir         : Open images directory  
