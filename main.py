@@ -217,7 +217,7 @@ class ExampleWidget(QWidget):
         print(self.psets)
 
     def export(self):
-        json_file = open('test.json', 'w')
+        json_file = open('results.json', 'w')
         json.dump(self.psets, json_file)
 
 
