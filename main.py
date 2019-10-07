@@ -28,7 +28,7 @@ class ExampleWidget(QWidget):
         self.img_y = 0
         self.SIZE = 800
         self.setGeometry(self.left, self.top, self.width, self.height)
-        self.setWindowTitle('Image View')
+        self.setWindowTitle('CoordinatesAnnotation')
         self.setButton()
         self.initUI()
 
@@ -217,7 +217,10 @@ class ExampleWidget(QWidget):
         print(self.psets)
 
     def export(self):
-        json_file = open('results.json', 'w')
+        if self.save_dir is None:
+            json_file = open('results.json', 'w')
+        else:
+            json_file = open(self.save_dir+'results.json', 'w')
         json.dump(self.psets, json_file)
 
 
