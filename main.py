@@ -16,7 +16,7 @@ import cv2
 import json
 
 
-class ExampleWidget(QWidget):
+class Widget(QWidget):
 
     def __init__(self):
         super().__init__()
@@ -31,6 +31,7 @@ class ExampleWidget(QWidget):
         self.setWindowTitle('CoordinatesAnnotation')
         self.setButton()
         self.initUI()
+        self.show()
 
     def initUI(self):
         self.px = None
@@ -50,7 +51,6 @@ class ExampleWidget(QWidget):
         qimg = QImage(image.flatten(), w, h, QImage.Format_RGB888)
         self.le.setPixmap(QPixmap.fromImage(qimg))
         self.le.move(self.img_x, self.img_y)
-        self.show()
 
     def setButton(self):
         self.btn1 = QPushButton(self)
@@ -128,7 +128,7 @@ class ExampleWidget(QWidget):
 
     def open_file(self):
         file = QFileDialog.getOpenFileName(self, 'Open file', "Image files (*.jpg *.gif)")
-        print(file)
+        self.name = file.split("/")[-2]
         if file[0]:
             self.images.append(file[0])
             self.idx += 1
@@ -136,11 +136,11 @@ class ExampleWidget(QWidget):
 
     def open_dir(self):
         path = QFileDialog.getExistingDirectory(self, 'Open dir')
+        self.name = path.split("/")[-1]
         if path:
             img_names = os.listdir(path)
             for name in img_names:
                 self.images.append(os.path.join(path, name))
-
             self.showImage(self.images[0])
 
     def set_save_dir(self):
@@ -177,8 +177,8 @@ class ExampleWidget(QWidget):
         if self.image is not None:
             x = event.pos().x() - self.img_x
             y = event.pos().y() - self.img_y
-            if x > self.img_x and x < self.img_x+self.SIZE:
-                if y > self.img_y and y < self.img_y+self.SIZE:
+            if x > 0 and x < self.SIZE:
+                if y > 0 and y < self.SIZE:
                     self.points.append((x, y))
                     x_, y_ = reproduce(self.ori_h, self.ori_w, np.asarray([x, y]), self.SIZE)
                     self.ori_points.append((round(x_, 1), round(y_, 1)))
@@ -206,6 +206,7 @@ class ExampleWidget(QWidget):
             del self.points[-1]
 
         self.drawPoint()
+        self.update()
 
     def deleteAll(self):
         if len(self.points) > 0:
@@ -220,13 +221,14 @@ class ExampleWidget(QWidget):
         if self.save_dir is None:
             json_file = open('results.json', 'w')
         else:
-            json_file = open(self.save_dir+'results.json', 'w')
+            json_file = open(os.path.join(self.save_dir, self.name, '_', 'results.json'), 'w')
         json.dump(self.psets, json_file)
 
 
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    ew = ExampleWidget()
+    w = Widget()
+    #w.show()
     # ew.main()
     sys.exit(app.exec_())
