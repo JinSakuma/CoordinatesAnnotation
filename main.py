@@ -140,7 +140,8 @@ class Widget(QWidget):
         if path:
             img_names = os.listdir(path)
             for name in img_names:
-                self.images.append(os.path.join(path, name))
+                if ".jpg" in name or ".png" in name:
+                    self.images.append(os.path.join(path, name))
             self.showImage(self.images[0])
 
     def set_save_dir(self):
@@ -155,6 +156,7 @@ class Widget(QWidget):
                 self.points = []
                 self.ori_points = []
                 self.showImage(self.images[self.idx])
+                self.repaint()
 
     def pre_img(self):
         if (self.image is not None) or (len(self.images) > 0):
@@ -163,8 +165,10 @@ class Widget(QWidget):
                 self.points = []
                 self.ori_points = []
                 self.showImage(self.images[self.idx])
+                self.repaint()
 
     def showImage(self, path):
+        print(path)
         image = cv2.imread(path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         self.ori_h, self.ori_w = image.shape[:2]
@@ -206,13 +210,14 @@ class Widget(QWidget):
             del self.points[-1]
 
         self.drawPoint()
-        self.update()
+        self.repaint()
 
     def deleteAll(self):
         if len(self.points) > 0:
             self.points.clear()
 
         self.drawPoint()
+        self.repaint()
 
     def get_points(self):
         print(self.psets)
@@ -221,7 +226,7 @@ class Widget(QWidget):
         if self.save_dir is None:
             json_file = open('results.json', 'w')
         else:
-            json_file = open(os.path.join(self.save_dir, self.name, '_', 'results.json'), 'w')
+            json_file = open(os.path.join(self.save_dir, self.name + '_' + 'results.json'), 'w')
         json.dump(self.psets, json_file)
 
 
@@ -229,6 +234,4 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     w = Widget()
-    #w.show()
-    # ew.main()
     sys.exit(app.exec_())
