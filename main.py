@@ -42,7 +42,7 @@ class Widget(QWidget):
         self.image = None
         self.images = []
         self.save_flg = []
-        self.idx = 0
+        self.idx = -1
         self.save_dir = None
 
         self.le = QLabel(self)
@@ -129,7 +129,8 @@ class Widget(QWidget):
 
     def open_file(self):
         file = QFileDialog.getOpenFileName(self, 'Open file', "Image files (*.jpg *.gif)")
-        self.name = file.split("/")[-2]
+        print(file)
+        self.name = file[0].split("/")[-1]
         if file[0]:
             self.images.append(file[0])
             self.save_flg.append(False)
@@ -142,10 +143,13 @@ class Widget(QWidget):
         if path:
             img_names = os.listdir(path)
             for name in img_names:
-                if ".jpg" in name or ".png" in name:
+                if ".jpg" in name or ".jpeg" in name or ".png" in name:
                     self.images.append(os.path.join(path, name))
                     self.save_flg.append(False)
-            self.showImage(self.images[0])
+
+            if len(self.images) > 0:
+                self.idx += 1
+                self.showImage(self.images[0])
 
     def set_save_dir(self):
         path = QFileDialog.getExistingDirectory(self, 'Open dir')
@@ -181,7 +185,7 @@ class Widget(QWidget):
         if (self.image is not None) or (len(self.images) > 0):
             flg = False
             if not self.save_flg[self.idx]:
-                buttonReply = QMessageBox.question(self, "confirm message", "The result is not saved. Do you show the next image?",
+                buttonReply = QMessageBox.question(self, "confirm message", "The result is not saved. Do you select the next image?",
                                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
                 if buttonReply == QMessageBox.Yes:
                     flg = True
@@ -226,19 +230,34 @@ class Widget(QWidget):
             self.update()
 
     def save(self):
-        if (self.image is not None) or (len(self.images) > 0):
-            self.save_flg[self.idx] = True
-            result = {}
-            result["path"] = self.images[self.idx]
-            result["points"] = self.ori_points
-            self.psets["{}".format(self.idx)] = result
+        if self.save_flg[self.idx]:
+            buttonReply = QMessageBox.question(self, "confirm message", "The result was saved. Do you want to overwrite?",
+                                               QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if buttonReply == QMessageBox.Yes:
+                flg = True
+            else:
+                flg = False
         else:
-            QMessageBox.warning(self, "warning message", "Select image dir or image file", QMessageBox.Yes)
+            flg = True
+
+        if flg:
+            if (self.image is not None) or (len(self.images) > 0):
+                if len(self.ori_points) == 7:
+                    self.save_flg[self.idx] = True
+                    result = {}
+                    result["path"] = self.images[self.idx]
+                    result["points"] = self.ori_points
+                    self.psets["{}".format(self.idx)] = result
+                else:
+                    QMessageBox.warning(self, "warning message", "You must plot just 7 points", QMessageBox.Yes)
+            else:
+                QMessageBox.warning(self, "warning message", "Select image dir or image file", QMessageBox.Yes)
 
     def drawPoint(self):
         copy = self.image.copy()
-        for x, y in self.points:
+        for i, (x, y) in enumerate(self.points):
             cv2.circle(copy, (x, y), 5, (255, 0, 255), -1)
+            cv2.putText(copy, str(i+1), (x-10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 2)
 
         h, w = copy.shape[:2]
         qimg = QImage(copy.flatten(), w, h, QImage.Format_RGB888)
@@ -272,11 +291,18 @@ class Widget(QWidget):
 
     def export(self):
         if (self.image is not None) or (len(self.images) > 0):
-            if self.save_dir is None:
-                json_file = open('results.json', 'w')
+            r = QMessageBox.question(self, "Confirmation", "Do you want to export the results to json file?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if r == QMessageBox.Yes:
+                if self.save_dir is None:
+                    json_file = open('results.json', 'w')
+                else:
+                    json_file = open(os.path.join(self.save_dir, self.name + '_' + 'results.json'), 'w')
+                json.dump(self.psets, json_file)
+
+                QMessageBox.information(None, "Information", "results exported", QMessageBox.Ok)
             else:
-                json_file = open(os.path.join(self.save_dir, self.name + '_' + 'results.json'), 'w')
-            json.dump(self.psets, json_file)
+                pass
+
         else:
             QMessageBox.warning(self, "warning message", "Select image dir or image file", QMessageBox.Yes)
 
