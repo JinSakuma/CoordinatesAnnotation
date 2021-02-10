@@ -1,7 +1,14 @@
 # CoordinatesAnnotation
+
 ![demo](https://user-images.githubusercontent.com/36182771/66269898-11e69b00-e889-11e9-81f5-2d5c5e1b0de1.jpg)
 
 
+## Installation
+```
+pip install requirements.txt
+```
+
+## Usage
 Open File        : Open an image file  
 Open Dir         : Open images directory  
 Select Save Dir  : Select directory to saving annotation results  
