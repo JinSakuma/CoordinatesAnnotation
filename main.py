@@ -33,6 +33,18 @@ class Widget(QWidget):
         self.initUI()
         self.show()
 
+    def initPrams(self):
+        self.px = None
+        self.py = None
+        self.points = []
+        self.ori_points = []
+        self.psets = {}
+        self.image = None
+        self.images = []
+        self.save_flg = []
+        self.idx = -1
+        self.save_dir = None
+
     def initUI(self):
         self.px = None
         self.py = None
@@ -128,28 +140,52 @@ class Widget(QWidget):
         self.lbl9.move(20, 695)
 
     def open_file(self):
-        file = QFileDialog.getOpenFileName(self, 'Open file', "Image files (*.jpg *.gif)")
-        print(file)
-        self.name = file[0].split("/")[-1]
-        if file[0]:
-            self.images.append(file[0])
-            self.save_flg.append(False)
-            self.idx += 1
-            self.showImage(file[0])
+        if len(self.psets) > 0:
+            buttonReply = QMessageBox.question(self, "confirm message", "The annotation will be reseted. Do you want to change the file?",
+                                               QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if buttonReply == QMessageBox.Yes:
+                flg = True
+            else:
+                flg = False
+        else:
+            flg = True
+
+        if flg:
+            self.initPrams()
+            file = QFileDialog.getOpenFileName(self, 'Open file', "Image files (*.jpg *.gif)")
+            print(file)
+            self.name = file[0].split("/")[-1]
+            if file[0]:
+                self.images.append(file[0])
+                self.save_flg.append(False)
+                self.idx += 1
+                self.showImage(file[0])
 
     def open_dir(self):
-        path = QFileDialog.getExistingDirectory(self, 'Open dir')
-        self.name = path.split("/")[-1]
-        if path:
-            img_names = os.listdir(path)
-            for name in img_names:
-                if ".jpg" in name or ".jpeg" in name or ".png" in name:
-                    self.images.append(os.path.join(path, name))
-                    self.save_flg.append(False)
+        if len(self.psets) > 0:
+            buttonReply = QMessageBox.question(self, "confirm message", "The annotation will be reseted. Do you want to change the folder?",
+                                               QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if buttonReply == QMessageBox.Yes:
+                flg = True
+            else:
+                flg = False
+        else:
+            flg = True
 
-            if len(self.images) > 0:
-                self.idx += 1
-                self.showImage(self.images[0])
+        if flg:
+            self.initPrams()
+            path = QFileDialog.getExistingDirectory(self, 'Open dir')
+            self.name = path.split("/")[-1]
+            if path:
+                img_names = os.listdir(path)
+                for name in img_names:
+                    if ".jpg" in name or ".jpeg" in name or ".png" in name:
+                        self.images.append(os.path.join(path, name))
+                        self.save_flg.append(False)
+
+                if len(self.images) > 0:
+                    self.idx += 1
+                    self.showImage(self.images[0])
 
     def set_save_dir(self):
         path = QFileDialog.getExistingDirectory(self, 'Open dir')
@@ -294,12 +330,11 @@ class Widget(QWidget):
             r = QMessageBox.question(self, "Confirmation", "Do you want to export the results to json file?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if r == QMessageBox.Yes:
                 if self.save_dir is None:
-                    json_file = open('results.json', 'w')
+                    QMessageBox.warning(self, "warning message", "Select folder to export json file.\nUse 'Select Save Dir' button.", QMessageBox.Yes)
                 else:
                     json_file = open(os.path.join(self.save_dir, self.name + '_' + 'results.json'), 'w')
-                json.dump(self.psets, json_file)
-
-                QMessageBox.information(None, "Information", "results exported", QMessageBox.Ok)
+                    json.dump(self.psets, json_file)
+                    QMessageBox.information(None, "Information", "results exported", QMessageBox.Ok)
             else:
                 pass
 
