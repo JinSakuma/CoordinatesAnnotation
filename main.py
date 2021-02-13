@@ -153,7 +153,6 @@ class Widget(QWidget):
         if flg:
             self.initPrams()
             file = QFileDialog.getOpenFileName(self, 'Open file', "Image files (*.jpg *.gif)")
-            print(file)
             self.name = file[0].split("/")[-1]
             if file[0]:
                 self.images.append(file[0])
@@ -292,8 +291,8 @@ class Widget(QWidget):
     def drawPoint(self):
         copy = self.image.copy()
         for i, (x, y) in enumerate(self.points):
-            cv2.circle(copy, (x, y), 5, (255, 0, 255), -1)
-            cv2.putText(copy, str(i+1), (x-10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 2)
+            cv2.circle(copy, (x, y), 2, (255, 0, 255), -1)
+            cv2.putText(copy, str(i+1), (x-10, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 1)
 
         h, w = copy.shape[:2]
         qimg = QImage(copy.flatten(), w, h, QImage.Format_RGB888)
